@@ -8,8 +8,11 @@ $State = {
     lastMouseUp: -1
 };
 
+var host = "localhost";
+var port = 11350;
+
 var sendingText = false;
-var ws = new WebSocket("ws://localhost:11350");
+var ws = new WebSocket("ws://" + host + ":" + port);
 ws.onmessage = function(e) {
    console.log(e.data);
    executeSamaritan(e.data);
