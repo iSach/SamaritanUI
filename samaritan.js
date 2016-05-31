@@ -8,6 +8,17 @@ $State = {
     lastMouseUp: -1
 };
 
+var sendingText = false;
+var ws = new WebSocket("ws://localhost:11350");
+ws.onmessage = function(e) {
+   console.log(e.data);
+   executeSamaritan(e.data);
+};
+ws.onerror = function(e) {
+    console.log("Error happened.");
+    executeSamaritan("No connection");
+};
+
 // From Stack Overflow
 // http://stackoverflow.com/questions/1582534/calculating-text-width-with-jquery
 $.fn.textWidth = function(){
@@ -86,7 +97,7 @@ $(document).ready(function(){
     }).bind("click", runRandomPhrase);
 
     // And do a timed random phrase
-    randomTimePhrase();
+    // randomTimePhrase();
 })
 
 var blinkTriangle = function()
@@ -120,7 +131,7 @@ var runRandomPhrase = function()
         }
     }
     $State.lastRandomIndex = randomIndex;
-    executeSamaritan($State.phraselist[randomIndex]);
+    // executeSamaritan($State.phraselist[randomIndex]);
 }
 
 var randomTimePhrase = function()
@@ -148,6 +159,7 @@ var executeSamaritan = function(phrase)
         'duration': $State.wordAnim,
         // Once animation triangle scale down is complete...
         'done': function() {
+            sendingText = true;
             var timeStart = 0;
             // Create timers for each word
             phraseArray.forEach(function (word, i) {
@@ -172,6 +184,7 @@ var executeSamaritan = function(phrase)
 
             // Set a final timer to hide text and show triangle
             setTimeout(function(){
+                sendingText = false;
                 // Clear the text
                 $State.text.html("");
                 // Animate trinagle back in
@@ -194,8 +207,7 @@ var executeSamaritan = function(phrase)
                         })
                     }
                 });
-            },
-            timeStart + $State.wordTime);
+            }, timeStart + $State.wordTime);
         }
     });
 }
